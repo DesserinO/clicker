@@ -8,7 +8,6 @@ public class UIController : MonoBehaviour
     [SerializeField] Button menuButtonOpen;
     [SerializeField] Button menuButtonGamePanel;
     [SerializeField] Button menuButtonUpgradePanel;
-    [SerializeField] Button menuButtonCloseMenu;
   
     [SerializeField] GameObject menuPanel;
     [SerializeField] GameObject startPos;
@@ -16,76 +15,113 @@ public class UIController : MonoBehaviour
     [SerializeField] GameObject backgroundMenu;
     [SerializeField] GameObject gamePanel;
     [SerializeField] GameObject upgradePanel;
+
+    private bool moveMenuPanel;
+    private bool moveMenuPanelBack;
+
+    public float moveSpeed;
+    private float tempMenuPos;
      
     // Start is called before the first frame update
     void Start()
     {
         gamePanel.SetActive(true);
         upgradePanel.SetActive(false);
-        menuPanel.SetActive(false);
+        menuPanel.SetActive(true);
         backgroundMenu.SetActive(false);
         menuPanel.transform.position = startPos.transform.position;
     }
 
-    public void OnClickMenuBtn()
+    public void MovePanel()
     {
-        menuPanel.SetActive(true);
-        menuButtonOpen.gameObject.SetActive(false);
-        backgroundMenu.gameObject.SetActive(true);
-        menuPanel.transform.position = endPos.transform.position;
+        moveMenuPanelBack = false;
+        moveMenuPanel = true;
     }
 
-    IEnumerator Wait()
+    public void MovePanelBack()
     {
-        yield return new WaitForSeconds(5);
-    }
-
-    public void OnClickCloseMenu()
-    {
-        menuPanel.transform.position = startPos.transform.position;
-        menuButtonOpen.gameObject.SetActive(true);
-        StartCoroutine(Wait());
-        backgroundMenu.gameObject.SetActive(false);
-        menuPanel.SetActive(false);
+        moveMenuPanelBack = true;
+        moveMenuPanel = false;
     }
 
     public void OnClickChangePanelToGame()
     {
         upgradePanel.SetActive(false);
         gamePanel.SetActive(true);
-        OnClickCloseMenu();
+        MovePanelBack();
     }
 
     public void OnClickChangePanelToUpgrade()
     {
         upgradePanel.SetActive(true);
         gamePanel.SetActive(false);
-        OnClickCloseMenu();
+        MovePanelBack();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void CheckButtons()
     {
         if (gamePanel.activeInHierarchy)
         {
-            /// Change button in menu to inactive
             menuButtonGamePanel.interactable = false;
         }
         else
         {
-            /// Change to active statement
             menuButtonGamePanel.interactable = true;
         }
 
         if (upgradePanel.activeInHierarchy)
         {
-            /// Change button in menu to inactive
             menuButtonUpgradePanel.interactable = false;
         }
         else
         {
-            /// Change to active statement
             menuButtonUpgradePanel.interactable = true;
         }
+    }
+
+    private void CheckMoveMenuPanel()
+    {
+        if (moveMenuPanel)
+        {
+            backgroundMenu.SetActive(true);
+            menuPanel.transform.position = Vector3.Lerp(menuPanel.transform.position, endPos.transform.position, moveSpeed * Time.deltaTime);
+
+            if (menuPanel.transform.localPosition.x == tempMenuPos)
+            {
+                moveMenuPanel = false;
+                menuPanel.transform.position = endPos.transform.position;
+                tempMenuPos = -999999999.99f;
+            }
+
+            if (moveMenuPanel)
+            {
+                tempMenuPos = menuPanel.transform.position.x;
+            }
+        }
+
+        if (moveMenuPanelBack)
+        {
+            backgroundMenu.SetActive(false);
+            menuPanel.transform.position = Vector3.Lerp(menuPanel.transform.position, startPos.transform.position, moveSpeed * Time.deltaTime);
+
+            if (menuPanel.transform.localPosition.x == tempMenuPos)
+            {
+                moveMenuPanelBack = false;
+                menuPanel.transform.position = startPos.transform.position;
+                tempMenuPos = -999999999.99f;
+            }
+
+            if (moveMenuPanelBack)
+            {
+                tempMenuPos = menuPanel.transform.position.x;
+            }
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        CheckButtons();
+        CheckMoveMenuPanel();
     }
 }

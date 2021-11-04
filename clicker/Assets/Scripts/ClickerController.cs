@@ -16,7 +16,7 @@ public class ClickerController : MonoBehaviour
     public void OnClick()
     {
         score += scoreAmount;
-        scoreText.text = $" {score.ToString()} Money";
+        scoreText.text = $" {score} Money";
     }
 
     void Start()
@@ -28,7 +28,7 @@ public class ClickerController : MonoBehaviour
     private void idle()
     {
         score += idleAmount;
-        scoreText.text = $" {score.ToString()} Money";
+        scoreText.text = $" {score} Money";
     }
 
     // Update is called once per frame
