@@ -4,10 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
+using System.Linq;
 
 public class ClickerController : MonoBehaviour
 {
-    [SerializeField] Text scoreText;
+    [SerializeField] Text scoreText, idleText;
     [SerializeField] private ulong score;
     
     [SerializeField] private ulong scoreAmount, idleAmount;
@@ -40,15 +41,16 @@ public class ClickerController : MonoBehaviour
     }
 
     // Idle function 
-    private void idle()
-    {
-        score += idleAmount;
+    private void idle() 
+    { 
+        score += idleAmount; 
     }
 
     void UpgradeInit()
     {
-        defaultValues = new ulong[10];
-        currentValues = new ulong[10];
+        var obj = Resources.FindObjectsOfTypeAll<GameObject>().LongCount(g => g.CompareTag("ItemContent"));
+        defaultValues = new ulong[obj - 1];
+        currentValues = new ulong[defaultValues.Length];
         idleValues = new ulong[defaultValues.Length - 1];
         defaultValues[0] = 5;
         idleValues[0] = 1;
@@ -109,7 +111,7 @@ public class ClickerController : MonoBehaviour
         {
             score -= currentValues[num];
             idleAmount += idleValues[num - 1];
-            currentValues[num] *= 2;
+            currentValues[num] += (currentValues[num] / 10);
         }
     }
 
@@ -127,7 +129,8 @@ public class ClickerController : MonoBehaviour
             upgradeModule[keyList[i]][1].text = currentValues[i].ToString();
         }
 
-        scoreText.text = $" {score} Money";
+        idleText.text = $"IDLE: {idleAmount}";
+        scoreText.text = $" {score}";
 
         if (idleAmount != 0)
         {
