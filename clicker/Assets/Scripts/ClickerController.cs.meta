@@ -3,7 +3,19 @@ guid: b8c9b15e8218b6c418ca378a9c495d4a
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - scoreText: {instanceID: 0}
+  - idleText: {instanceID: 0}
+  - clickX2: {instanceID: 0}
+  - upgrade1: {instanceID: 0}
+  - upgrade2: {instanceID: 0}
+  - upgrade3: {instanceID: 0}
+  - upgrade4: {instanceID: 0}
+  - upgrade5: {instanceID: 0}
+  - upgrade6: {instanceID: 0}
+  - upgrade7: {instanceID: 0}
+  - upgrade8: {instanceID: 0}
+  - upgrade9: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

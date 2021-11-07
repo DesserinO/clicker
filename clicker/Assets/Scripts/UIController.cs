@@ -5,16 +5,18 @@ using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
-    [SerializeField] Button menuButtonOpen;
     [SerializeField] Button menuButtonGamePanel;
     [SerializeField] Button menuButtonUpgradePanel;
+    [SerializeField] Button menuButtonResearchesPanel;
   
     [SerializeField] GameObject menuPanel;
     [SerializeField] GameObject startPos;
     [SerializeField] GameObject endPos;
     [SerializeField] GameObject backgroundMenu;
+    
     [SerializeField] GameObject gamePanel;
     [SerializeField] GameObject upgradePanel;
+    GameObject researchesPanel;
 
     private bool moveMenuPanel;
     private bool moveMenuPanelBack;
@@ -27,9 +29,12 @@ public class UIController : MonoBehaviour
     {
         gamePanel.SetActive(true);
         upgradePanel.SetActive(false);
+        /*researchesPanel.SetActive(false);*/
         menuPanel.SetActive(true);
         backgroundMenu.SetActive(false);
         menuPanel.transform.position = startPos.transform.position;
+        // Developing
+        menuButtonResearchesPanel.interactable = false;
     }
 
     public void MovePanel()
@@ -48,6 +53,7 @@ public class UIController : MonoBehaviour
     {
         upgradePanel.SetActive(false);
         gamePanel.SetActive(true);
+        /*researchesPanel.SetActive(false);*/
         MovePanelBack();
     }
 
@@ -55,6 +61,15 @@ public class UIController : MonoBehaviour
     {
         upgradePanel.SetActive(true);
         gamePanel.SetActive(false);
+        /*researchesPanel.SetActive(false);*/
+        MovePanelBack();
+    }
+
+    public void OnClickChangePanleToResearches()
+    {
+        upgradePanel.SetActive(false);
+        gamePanel.SetActive(false);
+        researchesPanel.SetActive(true);
         MovePanelBack();
     }
 
@@ -77,6 +92,15 @@ public class UIController : MonoBehaviour
         {
             menuButtonUpgradePanel.interactable = true;
         }
+
+        /*if (researchesPanel.activeInHierarchy)
+        {
+            menuButtonResearchesPanel.interactable = false;
+        }
+        else
+        {
+            menuButtonResearchesPanel.interactable = true;
+        }*/
     }
 
     private void CheckMoveMenuPanel()
