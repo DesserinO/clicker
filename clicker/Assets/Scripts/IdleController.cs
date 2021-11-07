@@ -9,13 +9,14 @@ using System.IO;
 public class IdleController
 {
     public Dictionary<string, Text[]> upgradeModule = new Dictionary<string, Text[]>();
+    
+    private ContentItem[] contentItems;
 
     /*private ulong idleAmount;*/
 
     private ulong[] currentValues;
     private ulong[] idleValues;
 
-    private string pathNames = "Assets/Resources/Data/Names.txt";
     public static IdleController Instance { get; private set; } = new IdleController();
 
     public void IdleInit(out ulong[] return1, out ulong[] return2, Dictionary<string, Text[]> return3)
@@ -37,17 +38,26 @@ public class IdleController
             }
         }
 
-        for (int i = 0; i < obj - 1; i++)
+        try 
         {
-            upgradeModule.Add(i.ToString(), contItem[i].GetComponentsInChildren<Text>());
-        }
+            for (int i = 0; i < obj - 1; i++)
+            {
+                upgradeModule.Add(i.ToString(), contItem[i].GetComponentsInChildren<Text>());
+            }
+        } catch { }
+        
 
-        StreamReader reader = new StreamReader(pathNames);
-        string[] names = reader.ReadToEnd().Split(',');
-        for (int i = 0; i < upgradeModule.Keys.LongCount(); i++)
+        try
         {
-            upgradeModule[i.ToString()][0].text = names[i];
-        }
+            contentItems = Resources.LoadAll<ContentItem>("Data").ToArray();
+            foreach (ContentItem g in contentItems)
+            {
+                for (int i = 0; i < g.Names.Length; i++)
+                {
+                    upgradeModule[i.ToString()][0].text = g.Names[i];
+                }
+            }
+        } catch { }
 
         currentValues = new ulong[obj - 1];
         idleValues = new ulong[currentValues.Length - 1];
@@ -75,7 +85,7 @@ public class IdleController
     {
         for (int i = 0; i < upgradeModule.Keys.LongCount(); i++)
         {
-            upgradeModule[i.ToString()][1].text = value[i].ToString();
+            try { upgradeModule[i.ToString()][1].text = value[i].ToString(); } catch { }
         }
     }
 }
