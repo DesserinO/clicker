@@ -1,91 +1,183 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEngine.UI;
 using System;
-using System.Linq;
-using System.IO;
 
 public class IdleController
 {
-    public Dictionary<string, Text[]> upgradeModule = new Dictionary<string, Text[]>();
-    
-    private ContentItem[] contentItems;
+	private float idleAmount, score;
+	private float scoreCoef;
+	private float coef = 3;
 
-    /*private ulong idleAmount;*/
+	private Dictionary<string, float> valueModule = new Dictionary<string, float>();
+	private List<string> keys = new List<string>();
+	private Text scoreText, idleText;
 
-    private ulong[] currentValues;
-    private ulong[] idleValues;
+	public static IdleController Instance { get; private set; } = new IdleController();
 
-    public static IdleController Instance { get; private set; } = new IdleController();
+	public void UpdateIdleText(out float return1)
+	{
+		foreach (string k in valueModule.Keys)
+		{
+			if (idleAmount <= Math.Pow(10, 6) && coef == 3 & !idleText.text.Contains(k))
+			{
+				idleText.text = $"{String.Format("{0:0}", idleAmount)}";
+			}
 
-    public void IdleInit(out ulong[] return1, out ulong[] return2, Dictionary<string, Text[]> return3)
-    {
-        // Get count of "ContentItem" PreFab
-        var obj = Resources.FindObjectsOfTypeAll<GameObject>().LongCount(g => g.CompareTag("ItemContent"));
-        
-        GameObject[] temp = Resources.FindObjectsOfTypeAll<GameObject>().ToArray();
-        GameObject[] contItem = new GameObject[obj - 1];
+			if (idleAmount > 999999 && coef == 3)
+			{
+				coef += coef;
+				idleAmount /= float.Parse(Math.Pow(10, 6).ToString());
 
-        foreach (GameObject a in temp)
-        {
-            for (int i = 0; i < obj - 1; i++)
-            {
-                if (a.name == i.ToString())
-                {
-                    contItem[Int64.Parse(a.name)] = a;
-                }
-            }
-        }
+				for (int i = 0; i < valueModule.Count; i++)
+				{
+					if (valueModule[keys[i]] == coef)
+					{
+						idleText.text = $"{String.Format("{0:0.0}", idleAmount)} {keys[i]}";
+					}
+				}
+			}
 
-        try 
-        {
-            for (int i = 0; i < obj - 1; i++)
-            {
-                upgradeModule.Add(i.ToString(), contItem[i].GetComponentsInChildren<Text>());
-            }
-        } catch { }
-        
+			if (idleAmount >= 1 && idleAmount <= 1000 & idleText.text.Contains(k))
+			{
+				for (int i = 0; i < valueModule.Count; i++)
+				{
+					if (valueModule[keys[i]] == coef)
+					{
+						idleText.text = $"{String.Format("{0:0.0}", idleAmount)} {keys[i]}";
+					}
+				}
+			}
 
-        try
-        {
-            contentItems = Resources.LoadAll<ContentItem>("Data").ToArray();
-            foreach (ContentItem g in contentItems)
-            {
-                for (int i = 0; i < g.Names.Length; i++)
-                {
-                    upgradeModule[i.ToString()][0].text = g.Names[i];
-                }
-            }
-        } catch { }
+			if (idleAmount > 999 && idleText.text.Contains(k))
+			{
+				idleAmount /= float.Parse(Math.Pow(10, 3).ToString());
+				coef += 3;
 
-        currentValues = new ulong[obj - 1];
-        idleValues = new ulong[currentValues.Length - 1];
-        currentValues[0] = 5;
-        idleValues[0] = 1;
+				for (int i = 0; i < valueModule.Count; i++)
+				{
+					if (valueModule[keys[i]] == coef)
+					{
+						idleText.text = $"{String.Format("{0:0.0}", idleAmount)} {keys[i]}";
+					}
+				}
+			}
+		}
+		return1 = idleAmount;
+	}
 
-        for (int i = 1; i < idleValues.Length; i++)
-        {
-            idleValues[i] = idleValues[i - 1] * 10;
-        }
+	public void SetValueModule (Dictionary<string, float> valueModule)
+	{
+		this.valueModule = valueModule;
+	}
 
-        ulong multiplier = 5;
-        for (int i = 1; i < currentValues.Length; i++)
-        {
-            multiplier += (multiplier / 5);
-            currentValues[i] = currentValues[i - 1] * multiplier;
-        }
+	public void SetKeys (List<string> keys)
+	{
+		this.keys = keys;
+	}
 
-        return1 = currentValues;
-        return2 = idleValues;
-        return3 = upgradeModule;
-    }
+	public void SetText (Text scoreText, Text idleText)
+	{
+		this.scoreText = scoreText;
+		this.idleText = idleText;
+	}
 
-    public void UpdateText(ulong[] value)
-    {
-        for (int i = 0; i < upgradeModule.Keys.LongCount(); i++)
-        {
-            try { upgradeModule[i.ToString()][1].text = value[i].ToString(); } catch { }
-        }
-    }
+	public void SetIdleAmount (float idleAmount)
+	{
+		this.idleAmount = idleAmount;
+	}
+
+	public void SetScoreCoef (float scoreCoef)
+	{
+		this.scoreCoef = scoreCoef;
+	}
+
+	public void SetScore (float score)
+	{
+		this.score = score;
+	}
+
+	public float GetIdleAmount()
+	{
+		return idleAmount;
+	}
+
+	public float GetTempCoef(float scoreCoef)
+	{
+		float tempCoef = 0;
+		float tempIdleCoef = this.coef;
+		for (int i = 0; i < valueModule.Count; i++)
+		{
+			if (tempIdleCoef < scoreCoef)
+			{
+				tempCoef += 3;
+				tempIdleCoef += 3;
+			}
+
+			if (tempIdleCoef > scoreCoef)
+			{
+				tempCoef += 3;
+				tempIdleCoef -= 3;
+			} else { break; }
+		}
+
+		return tempCoef;
+	}
+
+	public void Idle(out float return1, out float return2)
+	{
+		string[] temp = scoreText.text.Split(' ');
+		if (temp.Length > 1)
+		{
+			foreach (string k in valueModule.Keys)
+			{
+				if (temp[1] == k)
+				{
+					scoreCoef = valueModule[k];
+				}
+			}
+		} else
+		{
+			scoreCoef = coef;
+		}
+
+		if (coef == 3)
+		{
+			if (coef == scoreCoef)
+			{
+				score = float.Parse(temp[0]) + idleAmount;
+			}
+
+			if (scoreCoef == 6 && GetTempCoef(scoreCoef) < 12)
+			{
+				score = float.Parse(temp[0]) + (idleAmount / float.Parse(Math.Pow(10, scoreCoef).ToString()));
+			}
+
+			if (scoreCoef > 6 && GetTempCoef(scoreCoef) < 12)
+			{
+				score += idleAmount / float.Parse(Math.Pow(10, scoreCoef).ToString());
+			}
+		}
+
+		if (coef >= 6 && GetTempCoef(scoreCoef) < 12)
+		{
+			if (coef == scoreCoef)
+			{
+				score += idleAmount;
+			}
+
+			if (coef < scoreCoef && GetTempCoef(scoreCoef) < 12)
+			{
+				score += idleAmount / float.Parse(Math.Pow(10, scoreCoef).ToString());
+			}
+
+			if (coef > scoreCoef)
+			{
+				scoreCoef = coef;
+				score /= float.Parse(Math.Pow(10, scoreCoef).ToString());
+			}
+		}
+
+		return1 = score;
+		return2 = scoreCoef;
+	}
 }
