@@ -23,7 +23,10 @@ public class ClickerController : MonoBehaviour
 	List<char> alpha = new List<char>();
 	List<string> keys = new List<string>();
 
-	public static ClickerController Instance { get; private set; } = new ClickerController();
+	byte[] source = new byte[256];
+    private float elapsed1 = 0f;
+
+    public static ClickerController Instance { get; private set; } = new ClickerController();
 
 	public void OnClick()
 	{
@@ -39,6 +42,7 @@ public class ClickerController : MonoBehaviour
 
 	public void UpgradeClick()
 	{
+		// NEED REWORK
 		if (score >= float.Parse(currentValues[0]))
 		{
 			score -= float.Parse(currentValues[0]);
@@ -240,10 +244,23 @@ public class ClickerController : MonoBehaviour
 		return scoreText;
 	}
 
+	public ulong[] GetLvls()
+    {
+		return lvls;
+    }
+
+	public void LoadData()
+    {
+		SaveClient sv = new SaveClient(scoreText.text, lvls);
+		sv.Load();
+	}
+
 	// Start is called before the first frame update
 	void Start()
 	{
-		NumSystem.Instance.NumInit(out valueModule, out keys);
+        
+
+        NumSystem.Instance.NumInit(out valueModule, out keys);
 
 		UpgradeController.Instance.UpgradeInit(out currentValues, out idleValues, out lvls);
 		UpgradeController.Instance.SetValueModule(valueModule);
@@ -253,6 +270,9 @@ public class ClickerController : MonoBehaviour
 		IdleController.Instance.SetKeys(keys);
 		IdleController.Instance.SetText(scoreText, idleText);
 		IdleController.Instance.SetScoreCoef(coef);
+		
+		
+		
 	}
 
 	// Update is called once per frame
@@ -265,6 +285,9 @@ public class ClickerController : MonoBehaviour
 		UpdateScore();
 
 
+		// UPDATE CURRENTVALUES AND IDLEVALUES!!!
+
+
 		if (idleAmount != 0)
 		{
 			elapsed += Time.deltaTime;
@@ -275,5 +298,13 @@ public class ClickerController : MonoBehaviour
 				IdleController.Instance.Idle(out score, out coef);
 			}
 		}
-	}
+
+		elapsed1 += Time.deltaTime;
+		if (elapsed1 >= 3f)
+		{
+			elapsed1 %= 3f;
+            SaveClient sv = new SaveClient(scoreText.text, lvls);
+            sv.Save();
+        }
+		}
 }
