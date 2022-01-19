@@ -32,7 +32,7 @@ public class UIController : MonoBehaviour
         backgroundMenu.SetActive(false);
         menuPanel.transform.position = startPos.transform.position;
         // Developing
-        menuButtonResearchesPanel.interactable = true;
+        menuButtonResearchesPanel.interactable = false;
     }
 
     public void MovePanel()
