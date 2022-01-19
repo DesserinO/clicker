@@ -17,7 +17,11 @@ public class SaveClient : MonoBehaviour
         this.lvls = lvls;
     }
 
-   
+    public void LoadClient(out string return1, out ulong[] return2)
+    {
+        return1 = this.score;
+        return2 = this.lvls;
+    }
 
     static SaveData saveData = new SaveData();
     static int port = 7777; // порт сервера
@@ -25,24 +29,21 @@ public class SaveClient : MonoBehaviour
 
     public void Load()
     {
-        Debug.Log('1');
         try
         {
-            Debug.Log('2');
             IPEndPoint ipPoint = new IPEndPoint(IPAddress.Parse(address), port);
-            Debug.Log('3');
 
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            Debug.Log('4');
             // подключаемс€ к удаленному хосту
             socket.Connect(ipPoint);
 
-            byte[] data = new byte[256];
+
+            var data = new byte[256];
             var receivedData = socket.Receive(data);
-            Debug.Log('5');
-            Debug.Log(data);
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();
+            
+            /*return1 = data;*/
         }
         catch { }
         }

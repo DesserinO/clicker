@@ -258,7 +258,7 @@ public class ClickerController : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-        
+		
 
         NumSystem.Instance.NumInit(out valueModule, out keys);
 
@@ -270,9 +270,9 @@ public class ClickerController : MonoBehaviour
 		IdleController.Instance.SetKeys(keys);
 		IdleController.Instance.SetText(scoreText, idleText);
 		IdleController.Instance.SetScoreCoef(coef);
-		
-		
-		
+
+		byte[] data = new byte[256];
+		LoadData();
 	}
 
 	// Update is called once per frame
@@ -300,9 +300,9 @@ public class ClickerController : MonoBehaviour
 		}
 
 		elapsed1 += Time.deltaTime;
-		if (elapsed1 >= 3f)
+		if (elapsed1 >= 30f)
 		{
-			elapsed1 %= 3f;
+			elapsed1 %= 30f;
             SaveClient sv = new SaveClient(scoreText.text, lvls);
             sv.Save();
         }
